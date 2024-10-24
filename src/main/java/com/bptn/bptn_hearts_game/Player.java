@@ -9,7 +9,7 @@ public class Player {
 	private String name;
 	private ArrayList<Card> hand;
 	private int score;
-	private boolean user;
+	public boolean user;
 	
 	//creating constructor for Player with 2 parameters String name and boolean users
 	public Player(String name, boolean user) {
@@ -71,12 +71,11 @@ public class Player {
 				
 			if (choice < 0 || choice >= hand.size() || !validPlay(hand.get(choice), leadingCardType)) {
 				
-				System.out.println("Ivalid choice. Please select a valid card.");
+				System.out.println("Invalid choice. Please select a valid card.");
 				}
 			else {
 				Card cardPicked = hand.remove(choice);
 				System.out.println("You played: " + cardPicked);
-				scan.close();
 				return cardPicked;
 				}
 			}
@@ -133,12 +132,23 @@ public class Player {
 			}
 
 
-	private void displayHand() {
+	public void displayHand() {
 		//displaying hand
 		for (int i = 0; i < hand.size(); i++) {
 			System.out.println((i + 1) + ": " + hand.get(i));
 		}
 		
+	}
+
+
+
+	 boolean hasCardType(String leadingCard) {
+		for (Card card : hand) {
+			if (card.getCardType().equals(leadingCard)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 
