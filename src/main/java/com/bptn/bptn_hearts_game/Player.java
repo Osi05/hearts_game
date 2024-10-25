@@ -13,7 +13,7 @@ public class Player {
 	private int difficulty;
 	
 	//creating constructor for Player with 2 parameters String name and boolean users
-	public Player(String name, boolean user) {
+	public Player(String name, boolean user, int difficulty) {
 		this.name = name;
 		this.score = 0;
 		this.user = user;
