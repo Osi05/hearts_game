@@ -10,6 +10,7 @@ public class Player {
 	private ArrayList<Card> hand;
 	private int score;
 	public boolean user;
+	private int difficulty;
 	
 	//creating constructor for Player with 2 parameters String name and boolean users
 	public Player(String name, boolean user) {
@@ -17,6 +18,7 @@ public class Player {
 		this.score = 0;
 		this.user = user;
 		this.hand = new ArrayList<>();
+		this.difficulty = difficulty;
 	}
 
 	
@@ -86,6 +88,45 @@ public class Player {
 	private Card computerPlayer(String leadingCardType) {
 		
 		//checking for cards of the cardType in play
+//		ArrayList<Card> playableCards = new ArrayList<Card>();
+//		for (Card card : hand) {
+//			if (card.getCardType().equals(leadingCardType)) {
+//				playableCards.add(card);
+//			}
+//		}
+//		
+//		//if statement for player to play cards from playableCards
+//		if (!playableCards.isEmpty()) {
+//			Card pickedCard = playableCards.get(0);
+//			hand.remove(pickedCard);
+//			System.out.println(name + " played: " + pickedCard);
+//			return pickedCard;
+//		}
+//		else {
+//			Card pickedCard = hand.remove(0);
+//			System.out.println(name + " played: " + pickedCard);
+//			return pickedCard;
+//		}
+		
+		switch(difficulty) {
+		case 1: return easyDifficulty(leadingCardType);
+		case 2: return hardDifficulty(leadingCardType);
+		case 3: return expertDifficulty(leadingCardType);
+		default: return hand.remove(0);
+		}
+	}
+	
+	
+	private Card easyDifficulty(String leadingCardType) {
+
+		return hand.remove(0);
+	}
+
+
+
+	private Card hardDifficulty(String leadingCardType) {
+	
+		//checking for cards of the cardType in play
 		ArrayList<Card> playableCards = new ArrayList<Card>();
 		for (Card card : hand) {
 			if (card.getCardType().equals(leadingCardType)) {
@@ -93,21 +134,52 @@ public class Player {
 			}
 		}
 		
-		//if statement for player to play cards from playableCards
+		//playing first card that following current card
+		if (!playableCards.isEmpty()) {
+			return playableCards.get(0);
+		}
+		else {
+			return hand.remove(0);
+		}
+	}
+
+
+
+	private Card expertDifficulty(String leadingCardType) {
+		
+		ArrayList<Card> playableCards = new ArrayList<Card>();
+		for (Card card : hand) {
+			if (card.getCardType().equals(leadingCardType)) {
+				playableCards.add(card);
+			}
+		}
+		
+		//playing lowest card of card in play
 		if (!playableCards.isEmpty()) {
 			Card pickedCard = playableCards.get(0);
+			for (Card card : playableCards) {
+				if (card.getCardValue() < pickedCard.getCardValue()) {
+					pickedCard = card;
+				}
+			}
 			hand.remove(pickedCard);
-			System.out.println(name + " played: " + pickedCard);
 			return pickedCard;
 		}
 		else {
-			Card pickedCard = hand.remove(0);
-			System.out.println(name + " played: " + pickedCard);
+			//play highest card in hand
+			Card pickedCard = hand.get(0);
+			for (Card card : hand) {
+				if (card.getCardValue() < pickedCard.getCardValue()) {
+					pickedCard = card;
+				}
+			}
+			hand.remove(pickedCard);
 			return pickedCard;
 		}
 	}
-	
-	
+
+
+
 	private boolean validPlay(Card card, String leadingCardType) {
 
 		//check if there is a leadingCardTyper
