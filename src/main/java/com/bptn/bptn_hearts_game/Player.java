@@ -207,7 +207,7 @@ public class Player {
 			}
 
 
-	private void displayHand() {
+	public void displayHand() {
 		//displaying hand
 		for (int i = 0; i < hand.size(); i++) {
 			System.out.println((i + 1) + ": " + hand.get(i));
@@ -218,14 +218,14 @@ public class Player {
 
 
 
-//	 boolean hasCardType(String leadingCard) {
-//		for (Card card : hand) {
-//			if (card.getCardType().equals(leadingCard)) {
-//				return true;
-//			}
-//		}
-//		return false;
-//	}
+	 boolean hasCardType(String leadingCard) {
+		for (Card card : hand) {
+			if (card.getCardType().equals(leadingCard)) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 
 
