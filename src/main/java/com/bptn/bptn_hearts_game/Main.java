@@ -25,6 +25,7 @@ public class Main {
 			//choosing difficulty 
 			System.out.println("Choose difficulty : (1 - Easy, 2 - Hard, 3 - Expert): ");
 			int difficulty = scan.nextInt();
+			scan.nextLine();
 			
 			//logic for human multiplayers
 			ArrayList<Player> players = new ArrayList<Player>();
@@ -32,6 +33,7 @@ public class Main {
 			
 			System.out.println("How many human players (1-4)? ");
 			userCount = scan.nextInt();
+			scan.nextLine();
 			
 			
 			for (int i = 1; i <= userCount; i++) {

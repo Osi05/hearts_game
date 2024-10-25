@@ -158,7 +158,7 @@ public class Player {
 		if (!playableCards.isEmpty()) {
 			Card pickedCard = playableCards.get(0);
 			for (Card card : playableCards) {
-				if (card.getCardValue() < pickedCard.getCardValue()) {
+				if (card.getCardValue() > pickedCard.getCardValue()) {
 					pickedCard = card;
 				}
 			}
@@ -169,7 +169,7 @@ public class Player {
 			//play highest card in hand
 			Card pickedCard = hand.get(0);
 			for (Card card : hand) {
-				if (card.getCardValue() < pickedCard.getCardValue()) {
+				if (card.getCardValue() > pickedCard.getCardValue()) {
 					pickedCard = card;
 				}
 			}
@@ -224,10 +224,4 @@ public class Player {
 	}
 
 
-	
-	
-	
-	
-	
-	
 }
