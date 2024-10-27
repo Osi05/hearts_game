@@ -1,38 +1,101 @@
 package com.bptn.bptn_hearts_game;
 
 import java.util.ArrayList;
-import java.util.Scanner;
 
 public class Main {
 	
+	private static ArrayList<Player> players = new ArrayList<>();
+	
 	public static void main(String[] args) {
-		ArrayList<Player> players = new ArrayList<>();
-		players.add(new Player("John", true));
-		players.add(new Player("Joy", false));
-		players.add(new Player("Ella", false));
-		players.add(new Player("Bob", false));
+		AccountManager acct = new AccountManager();
+		Game game = new Game(players);
+		
+		
+		acct.loginOrCreateAccount();
+		
+		
+		game.startGame();
 		
 		
 		
-		Scanner scan = new Scanner(System.in);
+	}
 		
-		boolean playAgain;
 		
-		do {
-			Game game = new Game(players);
-			
-			game.startGame();
-			
-			System.out.println("Game over! Do you want to play again? (Y/N)");
-			
-			String userInput = scan.nextLine();
-			
-			playAgain = userInput.equals("Y");
-			
-		} while (playAgain);
 		
-		System.out.println("Thanks for playing!");
-		scan.close();
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+//		ArrayList<Player> players = new ArrayList<>();
+//		players.add(new Player("John", true));
+//		players.add(new Player("Joy", false));
+//		players.add(new Player("Ella", false));
+//		players.add(new Player("Bob", false));
+//		
+//		
+//		
+//		Scanner scan = new Scanner(System.in);
+//		
+//		boolean playAgain;
+//		
+//		do {
+//			Game game = new Game(players);
+//			
+//			game.startGame();
+//			
+//			System.out.println("Game over! Do you want to play again? (Y/N)");
+//			
+//			String userInput = scan.nextLine();
+//			
+//			playAgain = userInput.equals("Y");
+//			
+//		} while (playAgain);
+//		
+//		System.out.println("Thanks for playing!");
+//		scan.close();
 		
 		
 		
@@ -101,5 +164,4 @@ public class Main {
 //		System.out.println("Thanks for playing!");
 //		scan.close();
 		
-	}
 }
