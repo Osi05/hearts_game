@@ -9,10 +9,12 @@ public class Game {
 	private Deck deck;
 	private int currentRound;
 	private int currentTurn;
+	
+	
 	// creating a constructor for Game
 	public Game(ArrayList<Player> players) {
 		this.players = players;
-		this.deck = deck;
+		this.deck = new Deck();
 		this.currentRound = 1;
 		this.currentTurn = 1;
 	}
@@ -97,15 +99,17 @@ public class Game {
 		for (int i = 0; i < 13; i++) {
 			System.out.println("\n--- Round " + currentRound + ", Turn " + (i + 1) + " ---");
 			turn.clear();
+			leadingCardType = null; //reseting leading card for each turn
 			
 			for (int m = 0; m < players.size(); m++) {
-				int playerIndex = (startPlayerIndex + 1) % players.size();
+				int playerIndex = (startPlayerIndex + m) % players.size();
 				Player currentPlayer = players.get(playerIndex);
 				Card playedCard = null;
 				
 				while (playedCard == null) {
 					try {
 						playedCard = currentPlayer.playCard(leadingCardType);
+						
 						//checking if the card is same as leading card
 						if (leadingCardType != null && !playedCard.getCardType().equals(leadingCardType) && currentPlayer.hasCardType(leadingCardType)) {
 							throw new IllegalArgumentException("Invalid card played! You must follow leading card: " + leadingCardType);
@@ -120,7 +124,7 @@ public class Game {
 				turn.add(playedCard);
 				
 				//first card will determine the cards to play for that round
-				if (m == 0) {
+				if (leadingCardType == null) {
 					leadingCardType = playedCard.getCardType(); 
 				}
 			}
