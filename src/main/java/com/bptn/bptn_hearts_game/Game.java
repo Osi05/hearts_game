@@ -13,9 +13,9 @@ public class Game {
 	private int[] scores;
 	private int roundCount;
 	private boolean heartsBroken;
-	private int WinnerIndexTurn;
+	private int winnerTurnIndex;
 	private Scanner scan;
-	private List<Card> cardLastPlayed;
+	private List<Card> cardsLastPlayed;
 
 	
 	// creating a constructor for Game
@@ -25,9 +25,9 @@ public class Game {
 		this.scores = new int[players.size()];
 		this.roundCount = 1;
 		this.heartsBroken = false;
-		this.WinnerIndexTurn = 0;
+		this.winnerTurnIndex = 0;
 		this.scan = new Scanner(System.in);
-		this.cardLastPlayed = new ArrayList<>();
+		this.cardsLastPlayed = new ArrayList<>();
 	}
 	
 	
@@ -114,19 +114,160 @@ public class Game {
 	}
 	
 	private void playTurn() {
-		// TODO Auto-generated method stub
+		List<Card> turnCards = new ArrayList<>();
+		
+		for (int i = 0; i < players.size(); i++) {
+			int playerIndex = (winnerTurnIndex + i) % players.size();
+			Card playedCard;
+			
+			if (turnCards.isEmpty()) {
+				
+				if (playerIndex == 0) {
+					
+					playedCard = playerPlay(null);
+				} 
+				else {
+					playedCard = cpPlay(players.get(playerIndex), null);
+				}
+			}
+			else {
+				String leadingCardType = turnCards.get(0).getCardType();
+				
+				if (playerIndex == 0) {
+					playedCard = playerPlay(leadingCardType);
+				}
+				else {
+					playedCard = cpPlay(players.get(playerIndex), leadingCardType);
+				}
+			}
+			
+			turnCards.add(playedCard);
+		}
+		
+		winnerTurnIndex = determineTurnWinner(turnCards);
+		System.out.println("\nPlayer " + players.get(winnerTurnIndex).getUsername() + " wins this turn." + turnCards.get(winnerTurnIndex));
+		
+		if (!heartsBroken) {
+			heartsBroken = turnCards.stream().anyMatch(card -> card.getCardType().equals("Hearts"));
+		}
+		
+		//saving the played cards for potential undo
+		cardsLastPlayed = new ArrayList<>(turnCards);
+		
+		//SHOWING PLAYED CARDS FOR ALL PLAYERS
+		displayPlayedCards(turnCards);
+		
+		//option to undo last played move
+		System.out.println("\nPress 'u' to undo your last move or any other key to continue: ");
+		String undo = scan.nextLine();
+		
+		if (undo.equalsIgnoreCase("u")) {
+			undoLastMove();
+		}
+	}	
+
+
+	private void undoLastMove() {
+		
+		if (!cardsLastPlayed.isEmpty()) {
+			
+			Card lastCard = cardsLastPlayed.get(0);
+			players.get(0).addCard(lastCard);
+			System.out.println("Undid last move, card " + lastCard + " added back to your hand");
+			
+			//modify other players
+			System.out.println("Other players notified that the last move was undone");
+			
+			//remove the card from last played cards
+			cardsLastPlayed.remove(0);
+		}
+		else {
+			System.out.println("No moves to undo");
+		}
 		
 	}
+	
+	//method for displayPlayedCards
+	private void displayPlayedCards(List<Card> turnCards) {
+		System.out.println("\nCards played this turn:");
+		for (int i = 0; i < turnCards.size(); i++) {
+			System.out.println(players.get(i).getUsername() + " played: " + turnCards.get(i));
+		}
+	}
+	
+	//method for playerPlay
+	private Card playerPlay(String leadingCardType) {
+		System.out.println("\nYour turn to play. Your cards:");
+		displayCards(players.get(0).getCards());
 
+		Card playedCard;
+		while (true) {
+			System.out.print("Choose a card to play (1 to " + players.get(0).getCards().size() + "): ");
+			int choice = Integer.parseInt(scan.nextLine()) - 1;
+			playedCard = players.get(0).getCards().get(choice);
+			
+			if (leadingCardType == null || playedCard.getCardType().equals(leadingCardType) || !hasCardType(players.get(0).getCards(), leadingCardType)) {
+				players.get(0).getCards().remove(choice);
+				System.out.println("You played: " + playedCard);
+				return playedCard;
+			}
+			else {
+				System.out.println("You must play a card of the leading type if you have one");
+			}
+		}
+	}
+	
+	private boolean hasCardType(List<Card> cards, String cardType) {
+		
+		return cards.stream().anyMatch(card -> card.getCardType().equals(cardType));
+	}
 
+	private Card cpPlay(Player cpPlayer, String leadingCardType) {
+		Card playedCard = cpPlayer.getCards().get(0);
+		cpPlayer.getCards().remove(0);
+		System.out.println(cpPlayer.getUsername() + " played: " + playedCard);
+		return playedCard;
+	}
+	
+	
+	private int determineTurnWinner(List<Card> turnCards) {
+		Card winningCard = turnCards.get(0);
+		int winnerIndex = 0;
+		
+		for (int i = 1; i < turnCards.size(); i++) {
+			Card card = turnCards.get(i);
+			if (card.getCardType().equals(winningCard.getCardType()) && card.getCardWeight() > winningCard.getCardWeight()) {
+				winningCard = card;
+				winnerIndex = i;
+			}
+		}
+		return (winnerTurnIndex  + winnerIndex) % players.size();
+	}
+	
+	//method for updateScores
+	private void updateScores() {
+		System.out.println("\nScores updated: ");
+		for (int i = 0; i < players.size(); i++) {
+			System.out.println(players.get(i).getUsername() + ": " + scores[i]);
+		}
+	}
+	
 	private boolean checkForWinner() {
 		for (int score : scores) {
 			if (score >= 100) {
-				System.out.println("We have a winner!");
+				System.out.println("\nWe have a winner!");
 				return true;
 			}
 		}
 		return false;
 	}
 	
+	
+	//method to displayFinalScores
+	private void displayFinalScores() {
+		System.out.println("\n--- Final Scores ---");
+		for (int i = 0; i < players.size(); i++) {
+			System.out.println(players.get(i).getUsername() + ": " + scores[i]);
+		}
+	}
 }
