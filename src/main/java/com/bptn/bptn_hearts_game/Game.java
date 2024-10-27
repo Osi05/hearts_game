@@ -1,201 +1,132 @@
 package com.bptn.bptn_hearts_game;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
+
+
 public class Game {
 
 	// instance variables
 	private ArrayList<Player> players;
 	private Deck deck;
-	private int currentRound;
-	private int currentTurn;
-	
+	private int[] scores;
+	private int roundCount;
+	private boolean heartsBroken;
+	private int WinnerIndexTurn;
+	private Scanner scan;
+	private List<Card> cardLastPlayed;
+
 	
 	// creating a constructor for Game
 	public Game(ArrayList<Player> players) {
 		this.players = players;
 		this.deck = new Deck();
-		this.currentRound = 1;
-		this.currentTurn = 1;
+		this.scores = new int[players.size()];
+		this.roundCount = 1;
+		this.heartsBroken = false;
+		this.WinnerIndexTurn = 0;
+		this.scan = new Scanner(System.in);
+		this.cardLastPlayed = new ArrayList<>();
 	}
-	// method to startGame
+	
+	
 	public void startGame() {
-		try {
-			while (true) {
-				// using for each loop to deal 13 cards
-				deck = new Deck();
-				for (Player player : players) {
-					player.setHand(deck.deal(13));
-				}
-				// using traditional for loop pass cards at the beginner of round
-				for (int i = 0; i < players.size(); i++) {
-					Player player = players.get(i);
-					if (player.user) {
-						Scanner scan = new Scanner(System.in);
-						System.out.println("\n--- Round " + currentRound + " ---");
-						System.out.println(player.getName() + ", choose 3 cards to pass:");
-						ArrayList<Card> cardsToPass = new ArrayList<Card>();
-						for (int m = 0; m < 3; m++) {
-							int choice;
-							while (true) {
-								player.displayHand();
-								System.out.println(
-										"Choose card " + (m + 1) + " to pass (1 to " + player.getHand().size() + "): ");
-								choice = scan.nextInt();
-								if (choice < 1 || choice > player.getHand().size()) {
-									System.out.println("Invalid choice. Please select a valid card.");
-								} else {
-									cardsToPass.add(player.getHand().remove(choice - 1));
-									break;
-								}
-							}
-						}
-						// pass cards to next player
-						int nextPlayer = (i + 1) % players.size();
-						players.get(nextPlayer).passCards(cardsToPass);
-					} else {
-						// randomly select 3 cards fore computer player
-						ArrayList<Card> cardsToPass = new ArrayList<Card>();
-						for (int k = 0; k < 3; k++) {
-							int randomPick = (int) (Math.random() * player.getHand().size());
-							cardsToPass.add(player.getHand().remove(randomPick));
-						}
-						// pass cards to next player
-						int nextPlayer = (i + 1) % players.size();
-						players.get(nextPlayer).passCards(cardsToPass);
-					}
-				}
-				// calling playRound method
-				playRound();
-				
-				
-				//checking to see if game is over 
-				if (isGameOver()) {
-					break;
-				}
-				currentRound++;
-			}
-		} catch (Exception e) {
-			System.out.println("An Exception occurred: " + e.getMessage());
-			e.printStackTrace();
-		}
-		
-		//declaring winner
-		Player winner = players.get(0);
-		for (Player player : players) {
-			if (player.getScore() > winner.getScore()) {
-				winner = player;
+		while (true) {
+			System.out.println("------ Starting Round " + roundCount + " -----");
+			playRound();
+			roundCount++;
+			if (checkForWinner()) {
+				break;
 			}
 		}
-		System.out.println("The winner is " + winner.getName() + " with " + winner.getScore() + " points!");
-	}
-	
-	//method to play round
-	private void playRound() {
-		String leadingCardType = null;
-		ArrayList<Card> turn = new ArrayList<Card>();
-		int startPlayerIndex = 0;
-		
-		for (int i = 0; i < 13; i++) {
-			System.out.println("\n--- Round " + currentRound + ", Turn " + (i + 1) + " ---");
-			turn.clear();
-			leadingCardType = null; //reseting leading card for each turn
-			
-			for (int m = 0; m < players.size(); m++) {
-				int playerIndex = (startPlayerIndex + m) % players.size();
-				Player currentPlayer = players.get(playerIndex);
-				Card playedCard = null;
-				
-				while (playedCard == null) {
-					try {
-						playedCard = currentPlayer.playCard(leadingCardType);
-						
-						//checking if the card is same as leading card
-						if (leadingCardType != null && !playedCard.getCardType().equals(leadingCardType) && currentPlayer.hasCardType(leadingCardType)) {
-							throw new IllegalArgumentException("Invalid card played! You must follow leading card: " + leadingCardType);
-						}
-					}
-					catch (IllegalArgumentException e) {
-						System.out.println(e.getMessage());
-						playedCard = null; //keep prompting player
-					}
-				}
-				
-				turn.add(playedCard);
-				
-				//first card will determine the cards to play for that round
-				if (leadingCardType == null) {
-					leadingCardType = playedCard.getCardType(); 
-				}
-			}
-			
-			//determine player with the highest points per turn 
-			Player playerHigh = highestPoints(turn, startPlayerIndex, leadingCardType);
-			int turnPoints = calculatePoints(turn);
-			
-			//award all points to player with the highest card weight
-			playerHigh.addPoints(turnPoints);
-			
-			System.out.println(playerHigh.getName() + " receives " + turnPoints + " points!");
-			
-			//displaying scores
-			for (Player player : players) {
-				System.out.println(player.getName() + ": " + player.getScore() + " points");
-			}
-			
-			//player starts next turn
-			startPlayerIndex = players.indexOf(playerHigh);
-		}			
+		displayFinalScores();
 	}
 	
 	
-	//method to check if game is over 
-	private boolean isGameOver() {
-		for (Player player : players) {
-			if (player.getScore() >= 100) {
+	// method to playRound
+	public void playRound() {
+//		deck.shuffle();
+		dealCards();
+		passCards();
+		playTurns();
+	}
+	
+	//method for dealCards
+	private void dealCards() {
+		System.out.println("---- Dealing Cards ---");
+		deck.shuffle();
+		List<Card> allCards = deck.deal(52);
+		
+		for (int i = 0; i < players.size(); i++) {
+			players.get(i).addCard(allCards.remove(0));
+		}
+		
+		System.out.println("Your cards:");
+		displayCards(players.get(0).getCards()); // Assuming the first player is the main player
+	}
+	
+	//method for passCards
+	private void displayCards(List<Card> cards) {
+		for (int i = 0; i < cards.size(); i++) {
+			System.out.println((i + 1) + ": " + cards.get(i));
+		}
+	}
+	
+	//method for passCards
+	private void passCards() {
+		System.out.println("Passing cards...");
+		List<Card> cardsToPass = new ArrayList<>();
+		
+		for (int i = 0; i < 3; i++) {
+			System.out.print("\nChoose a card to pass (1 to " + players.get(0).getCards().size() + "): ");
+			int choice = Integer.parseInt(scan.nextLine()) - 1;
+			cardsToPass.add(players.get(0).getCards().remove(choice));
+			System.out.println("\nUpdated hand:");
+			displayCards(players.get(0).getCards());
+		}
+		
+		//for computerPlayer to pass cards
+		for (int i = 1; i <players.size(); i++) {
+			Player computerPlayer = players.get(i);
+			List<Card> cpCardsToPass = new ArrayList<>();
+			for (int m = 0; m < 3; m++) {
+				cpCardsToPass.add(computerPlayer.getCards().remove(0));
+			}
+			System.out.println(computerPlayer.getUsername() + " passes cards: " + cpCardsToPass);
+		}
+		
+		System.out.println("\nCards passed successfully.");
+		
+		//adding passed cards ro main player
+		players.get(0).getCards().addAll(cardsToPass);
+		System.out.println("Your remaining cards:");
+		displayCards(players.get(0).getCards());
+	}
+
+	private void playTurns() {
+		System.out.println("--- Playing Turns ---");
+		for (int i = 1; i <= 13; i++) {
+			System.out.println("--- Turn " + i + " ---");
+			playTurn();
+			updateScores();
+		} 
+	}
+	
+	private void playTurn() {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	private boolean checkForWinner() {
+		for (int score : scores) {
+			if (score >= 100) {
+				System.out.println("We have a winner!");
 				return true;
 			}
 		}
 		return false;
-	}
-	
-	
-	
-	//method for highestPoints
-	private Player highestPoints(ArrayList<Card> turn, int startPlayerIndex, String leadingCardType) {
-		Card highestCard = null;
-		int playerIndex = -1;
-		
-		for (int i = 0; i < turn.size(); i++) {
-			Card currentCard = turn.get(i);
-			
-			//checking if current card is the carding cardType
-			if (currentCard.getCardType().equals(leadingCardType)) {
-				if (highestCard == null || currentCard.getCardValue() > highestCard.getCardValue()) {
-					highestCard = currentCard;
-					
-					//updating the index of player with the highest card
-					playerIndex = (startPlayerIndex + i) % players.size();  
-				}
-			}
-		}
-		//returning the player who played highest card
-		return players.get(playerIndex);
-	}
-	
-	
-	//calculate points method
-	private int calculatePoints(ArrayList<Card> turn) {
-		int points = 0;
-		for (Card card : turn) {
-			if (card.getCardType().equals("Hearts")) {
-				points += 1;
-			}
-			if (card.getCardWeight().equals("Queen") && card.getCardType().equals("Spades")) {
-				points += 13;
-			}
-		}
-		return points;
 	}
 	
 }

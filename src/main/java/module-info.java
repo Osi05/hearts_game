@@ -4,4 +4,5 @@ module com.bptn.bptn_hearts_game {
 
     opens com.bptn.bptn_hearts_game to javafx.fxml;
     exports com.bptn.bptn_hearts_game;
+    
 }
