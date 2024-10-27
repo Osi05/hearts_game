@@ -7,11 +7,11 @@ public class Main {
 	private static ArrayList<Player> players = new ArrayList<>();
 	
 	public static void main(String[] args) {
-		AccountManager acct = new AccountManager();
+
 		Game game = new Game(players);
 		
 		
-		acct.loginOrCreateAccount();
+		AccountManager.loginOrCreateAccount();
 		
 		
 		game.startGame();
