@@ -29,6 +29,12 @@ public class Game {
 	}
 
 	public void startGame() {
+		System.out.println("\nDo you want to see the turotial? (Y/N)");
+		String showTutorial = scan.nextLine();
+		if (showTutorial.equalsIgnoreCase("Y")) {
+			showTutorial();
+		}
+		
 		while (true) {
 			System.out.println("------ Starting Round " + roundCount + " -----");
 
@@ -41,15 +47,32 @@ public class Game {
 		displayFinalScores();
 	}
 
+	private void showTutorial() {
+		System.out.println("\nWelcome to the Hearts game tutorial!");
+		System.out.println("In this game, you will:");
+		System.out.println("1. Create or log into your account.");
+		System.out.println("2. Decide if you want to play alone or with additional human players.");
+		System.out.println("3. Set the difficulty level for computer players.");
+		System.out.println("4. Start the game with 4 players (you, other human players, and/or computer players).");
+		System.out.println("5. Each player gets 13 cards. Your goal is to avoid taking hearts and the queen of spades.");
+		System.out.println("6. Follow the leading suit if you have it; if not, play any other card.");
+		System.out.println("7. Hearts cannot be played until they are broken (a heart has been played in a previous turn).");
+		System.out.println("8. The player who wins the trick (highest card of the leading suit) takes all the cards from that trick.");
+		System.out.println("9. Hearts count as 1 point each, and the queen of spades counts as 13 points.");
+		System.out.println("10. The player with the fewest points at the end of the game wins.");
+		System.out.println("11. You can undo your last move if necessary.");
+		System.out.println("Let's start the game and have fun!\n");
+	}
+
 	// method to playRound
 	public void playRound() {
 		dealCards();
 		passCards();
-		
+
 		for (Player player : players) {
 			player.clearTurns();
 		}
-		
+
 		playTurns();
 	}
 
@@ -119,45 +142,44 @@ public class Game {
 	}
 
 	private void playTurn() {
-	    List<Card> turnCards = new ArrayList<>();
-	    for (int i = 0; i < players.size(); i++) {
-	        int playerIndex = (winnerTurnIndex + i) % players.size();
-	        Card playedCard;
-	        if (turnCards.isEmpty()) {
-	            if (playerIndex == 0) {
-	                playedCard = playerPlay(null);
-	            } else {
-	                playedCard = cpPlay(players.get(playerIndex), null);
-	            }
-	        } else {
-	            String leadingCardType = turnCards.get(0).getCardType();
-	            if (playerIndex == 0) {
-	                playedCard = playerPlay(leadingCardType);
-	            } else {
-	                playedCard = cpPlay(players.get(playerIndex), leadingCardType);
-	            }
-	        }
-	        turnCards.add(playedCard);
-	    }
-	    winnerTurnIndex = determineTurnWinner(turnCards);
-	    System.out.println("\nPlayer " + players.get(winnerTurnIndex).getUsername() + " wins this turn with " + turnCards.get(winnerTurnIndex));
-	    if (!heartsBroken) {
-	        heartsBroken = turnCards.stream().anyMatch(card -> card.getCardType().equals("Hearts"));
-	    }
+		List<Card> turnCards = new ArrayList<>();
+		for (int i = 0; i < players.size(); i++) {
+			int playerIndex = (winnerTurnIndex + i) % players.size();
+			Card playedCard;
+			if (turnCards.isEmpty()) {
+				if (playerIndex == 0) {
+					playedCard = playerPlay(null);
+				} else {
+					playedCard = cpPlay(players.get(playerIndex), null);
+				}
+			} else {
+				String leadingCardType = turnCards.get(0).getCardType();
+				if (playerIndex == 0) {
+					playedCard = playerPlay(leadingCardType);
+				} else {
+					playedCard = cpPlay(players.get(playerIndex), leadingCardType);
+				}
+			}
+			turnCards.add(playedCard);
+		}
+		winnerTurnIndex = determineTurnWinner(turnCards);
+		System.out.println("\nPlayer " + players.get(winnerTurnIndex).getUsername() + " wins this turn with "
+				+ turnCards.get(winnerTurnIndex));
+		if (!heartsBroken) {
+			heartsBroken = turnCards.stream().anyMatch(card -> card.getCardType().equals("Hearts"));
+		}
 
-	    // Assign the turn cards to the winning player
-	    players.get(winnerTurnIndex).addTurn(turnCards);
+		// Assign the turn cards to the winning player
+		players.get(winnerTurnIndex).addTurn(turnCards);
 
-	    cardsLastPlayed = new ArrayList<>(turnCards);
-	    displayPlayedCards(turnCards);
-	    System.out.println("\nPress 'u' to undo your last move or any other key to continue: ");
-	    String undo = scan.nextLine();
-	    if (undo.equalsIgnoreCase("u")) {
-	        undoLastMove();
-	    }
+		cardsLastPlayed = new ArrayList<>(turnCards);
+		displayPlayedCards(turnCards);
+		System.out.println("\nPress 'u' to undo your last move or any other key to continue: ");
+		String undo = scan.nextLine();
+		if (undo.equalsIgnoreCase("u")) {
+			undoLastMove();
+		}
 	}
-
-
 
 	private void undoLastMove() {
 
@@ -224,37 +246,33 @@ public class Game {
 		return cards.stream().anyMatch(card -> !card.getCardType().equals(excludedSuit));
 	}
 
-	
 	private Card cpPlay(Player cpPlayer, String leadingCardType) {
-	    Card playedCard;
-	    String difficulty = cpPlayer.getDifficulty();
+		Card playedCard;
+		String difficulty = cpPlayer.getDifficulty();
 
-	    switch (difficulty) {
-	        case "easy":
-	            // Randomly play any card
-	            playedCard = cpPlayer.getCards().get(0);
-	            break;
-	        case "hard":
-	            // Play a card following basic strategy
-	            playedCard = cpPlayer.getCards().stream()
-	                    .filter(card -> card.getCardType().equals(leadingCardType))
-	                    .findFirst().orElse(cpPlayer.getCards().get(0));
-	            break;
-	        case "expert":
-	            // Play a card following advanced strategy
-	            playedCard = cpPlayer.getCards().stream()
-	                    .filter(card -> card.getCardType().equals(leadingCardType))
-	                    .max((c1, c2) -> Integer.compare(c1.getCardWeight(), c2.getCardWeight()))
-	                    .orElse(cpPlayer.getCards().get(0));
-	            break;
-	        default:
-	            throw new IllegalStateException("Unexpected difficulty level: " + difficulty);
-	    }
-	    cpPlayer.removeCard(playedCard);
-	    System.out.println(cpPlayer.getUsername() + " played: " + playedCard);
-	    return playedCard;
+		switch (difficulty) {
+		case "easy":
+			// Randomly play any card
+			playedCard = cpPlayer.getCards().get(0);
+			break;
+		case "hard":
+			// Play a card following basic strategy
+			playedCard = cpPlayer.getCards().stream().filter(card -> card.getCardType().equals(leadingCardType))
+					.findFirst().orElse(cpPlayer.getCards().get(0));
+			break;
+		case "expert":
+			// Play a card following advanced strategy
+			playedCard = cpPlayer.getCards().stream().filter(card -> card.getCardType().equals(leadingCardType))
+					.max((c1, c2) -> Integer.compare(c1.getCardWeight(), c2.getCardWeight()))
+					.orElse(cpPlayer.getCards().get(0));
+			break;
+		default:
+			throw new IllegalStateException("Unexpected difficulty level: " + difficulty);
+		}
+		cpPlayer.removeCard(playedCard);
+		System.out.println(cpPlayer.getUsername() + " played: " + playedCard);
+		return playedCard;
 	}
-
 
 	private int determineTurnWinner(List<Card> turnCards) {
 		Card winningCard = turnCards.get(0);
@@ -273,25 +291,23 @@ public class Game {
 
 	// method for updateScores
 	private void updateScores() {
-	    for (Player player : players) {
-	        int roundScore = 0;
-	        for (Card card : player.getTurns()){
-	            if (card.getCardType().equals("Hearts")) {
-	                roundScore++;
-	            } else if (card.getCardType().equals("Spades") && card.getCardWeight() == 12) {
-	                roundScore += 13;
-	            }
-	        }
-	        scores[players.indexOf(player)] += roundScore;
-	    }
+		for (Player player : players) {
+			int roundScore = 0;
+			for (Card card : player.getTurns()) {
+				if (card.getCardType().equals("Hearts")) {
+					roundScore++;
+				} else if (card.getCardType().equals("Spades") && card.getCardWeight() == 12) {
+					roundScore += 13;
+				}
+			}
+			scores[players.indexOf(player)] += roundScore;
+		}
 
-	    System.out.println("\nScores updated: ");
-	    for (int i = 0; i < players.size(); i++) {
-	        System.out.println(players.get(i).getUsername() + ": " + scores[i]);
-	    }
+		System.out.println("\nScores updated: ");
+		for (int i = 0; i < players.size(); i++) {
+			System.out.println(players.get(i).getUsername() + ": " + scores[i]);
+		}
 	}
-
-
 
 	private boolean checkForWinner() {
 		for (int score : scores) {
