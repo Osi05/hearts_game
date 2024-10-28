@@ -305,7 +305,7 @@ public class Game {
 	}
 
 	// method for updateScores
-	private void updateScores() {
+	public void updateScores() {
 		for (Player player : players) {
 			int roundScore = 0;
 			for (Card card : player.getTurns()) {
@@ -383,6 +383,11 @@ public class Game {
 			player.clearTurns();
 		}
 		startGame();
+	}
+	
+	//test
+	public int[] getScores() {
+		return scores;
 	}
 
 }
