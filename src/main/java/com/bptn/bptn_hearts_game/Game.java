@@ -50,6 +50,16 @@ public class Game {
 		displayFinalScores();
 		savesScores();
 		saveGameData();
+		
+		//ask player if they want to play again
+		System.out.println("\nDo you want to play again? (Y/N)");
+		String playAgain = scan.nextLine();
+		if (playAgain.equalsIgnoreCase("Y")) {
+			resetGame();
+		}else {
+			System.out.println("Thank you for playing! Goodbye...");
+			System.exit(0);
+		}
 	}
 
 	private void showTutorial() {
@@ -362,6 +372,17 @@ public class Game {
 			System.out.println("An error occurred while saving game data.");
 			e.printStackTrace();
 		}
+	}
+	
+	//method for resetting game
+	private void resetGame() {
+		roundCount = 1;
+		heartsBroken = false;
+		winnerTurnIndex = 0;
+		for (Player player : players) {
+			player.clearTurns();
+		}
+		startGame();
 	}
 
 }
