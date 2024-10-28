@@ -1,0 +1,9 @@
+Round 1
+Player1 turns: 
+12 of Spades
+2 of Hearts
+3 of Hearts
+4 of Hearts
+Player2 turns: 
+Player3 turns: 
+Player4 turns: 

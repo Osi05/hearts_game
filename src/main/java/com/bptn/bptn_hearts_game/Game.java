@@ -343,7 +343,7 @@ public class Game {
 	}
 	
 	//method for savesScores 
-	private void savesScores() {
+	public void savesScores() {
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter("scores.txt"))) {
 			for (int i = 0; i < players.size(); i++) {
 				writer.write(players.get(i).getUsername() + ": " + scores[i] + "\n");
@@ -356,7 +356,7 @@ public class Game {
 	}
 	
 	//method for saveGameData
-	private void saveGameData() {
+	public void saveGameData() {
 		try (BufferedWriter writer = new BufferedWriter(new FileWriter("game_data.txt"))) {
 			for (int round = 1; round <= roundCount; round++) {
 				writer.write("Round " + round + "\n");
