@@ -1,5 +1,8 @@
 package com.bptn.bptn_hearts_game;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -45,6 +48,8 @@ public class Game {
 			}
 		}
 		displayFinalScores();
+		savesScores();
+		saveGameData();
 	}
 
 	private void showTutorial() {
@@ -324,6 +329,38 @@ public class Game {
 		System.out.println("\n--- Final Scores ---");
 		for (int i = 0; i < players.size(); i++) {
 			System.out.println(players.get(i).getUsername() + ": " + scores[i]);
+		}
+	}
+	
+	//method for savesScores 
+	private void savesScores() {
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter("scores.txt"))) {
+			for (int i = 0; i < players.size(); i++) {
+				writer.write(players.get(i).getUsername() + ": " + scores[i] + "\n");
+			}
+			System.out.println("Scores saved to scores.txt");
+		} catch (IOException e) {
+			System.out.println("An error occurred while saving scores.");
+			e.printStackTrace();
+		}
+	}
+	
+	//method for saveGameData
+	private void saveGameData() {
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter("game_data.txt"))) {
+			for (int round = 1; round <= roundCount; round++) {
+				writer.write("Round " + round + "\n");
+				for (Player player : players) {
+					writer.write(player.getUsername() + " turns: \n");
+					for (Card card : player.getTurns()) {
+						writer.write(card.toString() + "\n");
+					}
+				}
+			}
+			System.out.println("Game data saved to game.txt");
+		} catch (IOException e) {
+			System.out.println("An error occurred while saving game data.");
+			e.printStackTrace();
 		}
 	}
 
