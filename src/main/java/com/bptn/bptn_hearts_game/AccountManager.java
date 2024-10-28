@@ -40,8 +40,36 @@ public class AccountManager {
 			System.out.println(player.getUsername());
 		}
 		
+		//add computer players
+		addComputerPlayers();
+		
 	}
 	
+	//method to addComputerPlayers
+	private static void addComputerPlayers() {
+		int humanPlayers = players.size();
+		int computerPlayersAdded = 0;
+		
+		if (humanPlayers == 1) {
+			computerPlayersAdded = 3;
+			} 
+		else if (humanPlayers == 2) {
+			computerPlayersAdded = 2;
+			}
+		else if (humanPlayers == 1) {
+			computerPlayersAdded = 1; 
+			}
+		
+		for (int i = 1; i <= computerPlayersAdded; i++) {
+			Player computerPlayer = new Player("computerPlayer " + i);
+			players.add(computerPlayer);
+		}
+		
+		System.out.println("Players after adding computerPlayers: ");
+		for (Player player : players) {
+			System.out.println(player.getUsername());
+		}
+	}
 	
 	private static Player loginOrCreateSingleAccount() {
 		while(true) {
@@ -65,7 +93,7 @@ public class AccountManager {
 	
 	
 	private static int getNumberOfPlayers() {
-		System.out.println("How many additional huma players? ");
+		System.out.println("How many additional human players? ");
 		return Integer.parseInt(scan.nextLine());
 	}
 	
@@ -113,8 +141,13 @@ public class AccountManager {
 			return new Player(username);
 		}
 		catch (IOException e) {
-			System.out.println("Error writing to accounts file.");
+			System.out.println("\nError writing to accounts file.");
 			return null;
 		}
 	}
+	
+	public static ArrayList<Player> getPlayers() {
+		return new ArrayList<>(players);
+	}
+	
 }

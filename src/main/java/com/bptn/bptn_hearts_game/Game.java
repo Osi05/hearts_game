@@ -17,7 +17,7 @@ public class Game {
 	private Scanner scan;
 	private List<Card> cardsLastPlayed;
 
-	
+
 	// creating a constructor for Game
 	public Game(ArrayList<Player> players) {
 		this.players = players;
@@ -34,6 +34,7 @@ public class Game {
 	public void startGame() {
 		while (true) {
 			System.out.println("------ Starting Round " + roundCount + " -----");
+			
 			playRound();
 			roundCount++;
 			if (checkForWinner()) {
@@ -46,7 +47,6 @@ public class Game {
 	
 	// method to playRound
 	public void playRound() {
-//		deck.shuffle();
 		dealCards();
 		passCards();
 		playTurns();
@@ -57,16 +57,20 @@ public class Game {
 		System.out.println("---- Dealing Cards ---");
 		deck.shuffle();
 		List<Card> allCards = deck.deal(52);
+		System.out.println("All cards dealt: " + allCards.size());
+		System.out.println("Number of players: " + players.size());
 		
-		for (int i = 0; i < players.size(); i++) {
-			players.get(i).addCard(allCards.remove(0));
-		}
-		
+		// Distributing cards
+		for (int i = 0; i < 13; i++) {
+			for (Player player : players) {
+				player.addCard(allCards.remove(0));
+				}
+			}
 		System.out.println("Your cards:");
 		displayCards(players.get(0).getCards()); // Assuming the first player is the main player
 	}
 	
-	//method for passCards
+	//method for displayCards
 	private void displayCards(List<Card> cards) {
 		for (int i = 0; i < cards.size(); i++) {
 			System.out.println((i + 1) + ": " + cards.get(i));
@@ -270,4 +274,6 @@ public class Game {
 			System.out.println(players.get(i).getUsername() + ": " + scores[i]);
 		}
 	}
+	
+	
 }

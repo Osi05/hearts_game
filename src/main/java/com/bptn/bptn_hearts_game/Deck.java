@@ -13,16 +13,18 @@ public class Deck {
 	//creating a constructor for my deck
 	public Deck() {
 		cards = new ArrayList<>();
-		initializedDeck();
+		initializeDeck();
+	
 	}
 	
 	//creating a method to initialize my deck
-	private void initializedDeck() {
-	
-		String[] suits = {"Hearts", "Diamonds", "Clubs", "Spades"};
-		for (String suit : suits) {
-			for (int value = 1; value <= 13; value++) {
-				cards.add(new Card(suit, value));
+	public void initializeDeck() {
+
+//		getCards().clear();
+		String[] cardTypes = {"Hearts", "Diamonds", "Clubs", "Spades"};
+		for (String cardType : cardTypes) {
+			for (int i = 1; i <= 13; i++) {
+				cards.add(new Card(cardType, i));
 			}
 		}
 	}
@@ -35,6 +37,7 @@ public class Deck {
 	//creating a method to deal my deck
 	public List<Card> deal(int count) {
 		List<Card> dealtCards = new ArrayList<>();
+	    
 		for (int i = 0; i < count; i++) {
 			dealtCards.add(cards.remove(0));
 		}
