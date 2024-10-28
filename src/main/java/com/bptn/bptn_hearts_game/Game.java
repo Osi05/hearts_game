@@ -201,38 +201,55 @@ public class Game {
 	
 	//method for playerPlay
 	private Card playerPlay(String leadingCardType) {
-		System.out.println("\nYour turn to play. Your cards:");
-		displayCards(players.get(0).getCards());
-
-		Card playedCard;
-		while (true) {
-			System.out.print("Choose a card to play (1 to " + players.get(0).getCards().size() + "): ");
-			int choice = Integer.parseInt(scan.nextLine()) - 1;
-			playedCard = players.get(0).getCards().get(choice);
-			
-			if (leadingCardType == null || playedCard.getCardType().equals(leadingCardType) || !hasCardType(players.get(0).getCards(), leadingCardType)) {
-				players.get(0).getCards().remove(choice);
-				System.out.println("You played: " + playedCard);
-				return playedCard;
-			}
-			else {
-				System.out.println("You must play a card of the leading type if you have one");
-			}
-		}
+	    System.out.println("\nYour turn to play. Your cards:");
+	    displayCards(players.get(0).getCards());
+	    Card playedCard;
+	    while (true) {
+	        System.out.print("Choose a card to play (1 to " + players.get(0).getCards().size() + "): ");
+	        int choice = Integer.parseInt(scan.nextLine()) - 1;
+	        playedCard = players.get(0).getCards().get(choice);
+	        
+	        // Ensure player follows leading card type if they have it
+	        if (leadingCardType == null || playedCard.getCardType().equals(leadingCardType) || !hasCardType(players.get(0).getCards(), leadingCardType)) {
+	            // Ensure hearts are not played unless broken
+	            if (!heartsBroken && playedCard.getCardType().equals("Hearts")) {
+	                if (hasOtherCardType(players.get(0).getCards(), "Hearts")) {
+	                    System.out.println("Hearts cannot be played until they are broken.");
+	                    continue;
+	                }
+	            }
+	            players.get(0).getCards().remove(choice);
+	            System.out.println("You played: " + playedCard);
+	            return playedCard;
+	        } else {
+	            System.out.println("You must play a card of the leading type if you have one");
+	        }
+	    }
 	}
+
 	
 	private boolean hasCardType(List<Card> cards, String cardType) {
 		
 		return cards.stream().anyMatch(card -> card.getCardType().equals(cardType));
 	}
-
-	private Card cpPlay(Player cpPlayer, String leadingCardType) {
-		Card playedCard = cpPlayer.getCards().get(0);
-		cpPlayer.getCards().remove(0);
-		System.out.println(cpPlayer.getUsername() + " played: " + playedCard);
-		return playedCard;
-	}
 	
+    private boolean hasOtherCardType(List<Card> cards, String excludedSuit) {
+        return cards.stream().anyMatch(card -> !card.getCardType().equals(excludedSuit));
+    }
+
+    private Card cpPlay(Player cpPlayer, String leadingCardType) {
+        Card playedCard;
+        if (leadingCardType != null && hasCardType(cpPlayer.getCards(), leadingCardType)) {
+            playedCard = cpPlayer.getCards().stream()
+                    .filter(card -> card.getCardType().equals(leadingCardType))
+                    .findFirst().orElse(null);
+        } else {
+            playedCard = cpPlayer.getCards().get(0);
+        }
+        cpPlayer.getCards().remove(playedCard);
+        System.out.println(cpPlayer.getUsername() + " played: " + playedCard);
+        return playedCard;
+    }
 	
 	private int determineTurnWinner(List<Card> turnCards) {
 		Card winningCard = turnCards.get(0);
@@ -250,6 +267,17 @@ public class Game {
 	
 	//method for updateScores
 	private void updateScores() {
+		for (Player player : players) {
+			for (Card card : player.getCards()) {
+				if (card.getCardType().equals("Hearts")) {
+					scores[players.indexOf(player)]++;
+				}
+				else if (card.getCardType().equals("Spades") && card.getCardWeight() == 12) {
+					scores[players.indexOf(player)] += 13;
+				}
+			}
+		}
+		
 		System.out.println("\nScores updated: ");
 		for (int i = 0; i < players.size(); i++) {
 			System.out.println(players.get(i).getUsername() + ": " + scores[i]);

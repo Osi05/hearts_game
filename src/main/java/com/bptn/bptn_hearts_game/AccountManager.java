@@ -61,7 +61,7 @@ public class AccountManager {
 			}
 		
 		for (int i = 1; i <= computerPlayersAdded; i++) {
-			Player computerPlayer = new Player("computerPlayer " + i);
+			Player computerPlayer = new Player("computerPlayer" + i);
 			players.add(computerPlayer);
 		}
 		
