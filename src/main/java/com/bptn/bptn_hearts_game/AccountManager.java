@@ -40,36 +40,31 @@ public class AccountManager {
 			System.out.println(player.getUsername());
 		}
 		
-		//add computer players
-		addComputerPlayers();
+		//add computer players with difficulty option
+		chooseDifficulty();
 		
 	}
 	
-	//method to addComputerPlayers
-	private static void addComputerPlayers() {
-		int humanPlayers = players.size();
-		int computerPlayersAdded = 0;
+	//method for diffculty
+	public static void chooseDifficulty() {
+		String difficulty = "";
+		if (players.size() < 4) {
+			System.out.println("Choose difficulty (easy, hard, expert): ");
+			difficulty = scan.nextLine().toLowerCase();
+		}
 		
-		if (humanPlayers == 1) {
-			computerPlayersAdded = 3;
-			} 
-		else if (humanPlayers == 2) {
-			computerPlayersAdded = 2;
-			}
-		else if (humanPlayers == 1) {
-			computerPlayersAdded = 1; 
-			}
-		
+		int computerPlayersAdded = 4 - players.size();
 		for (int i = 1; i <= computerPlayersAdded; i++) {
-			Player computerPlayer = new Player("computerPlayer" + i);
+			Player computerPlayer = new Player("computerPlayer" + i, difficulty);
 			players.add(computerPlayer);
 		}
 		
-		System.out.println("Players after adding computerPlayers: ");
-		for (Player player : players) {
-			System.out.println(player.getUsername());
-		}
+	    System.out.println("Players after adding computers: ");
+	    for (Player player : players) {
+	        System.out.println(player.getUsername());
+	    }
 	}
+	
 	
 	private static Player loginOrCreateSingleAccount() {
 		while(true) {
@@ -109,7 +104,7 @@ public class AccountManager {
 				String[] accountDetails = line.split(",");
 				if(accountDetails[0].equals(username) && accountDetails[1].equals(password)) {
 					System.out.println("\nLogin successful! \nWelcome " + username + "!");
-					return new Player(username);
+					return new Player(username, "easy"); //default difficulty
 				}
 				
 			}
@@ -138,7 +133,7 @@ public class AccountManager {
 			writeFile.write(username + "," + password);
 			writeFile.newLine();
 			System.out.println("\nAccount created sucessfully!");
-			return new Player(username);
+			return new Player(username, "easy");
 		}
 		catch (IOException e) {
 			System.out.println("\nError writing to accounts file.");

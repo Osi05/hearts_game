@@ -9,13 +9,15 @@ public class Player {
 	private String username;
 	private ArrayList<Card> cards;
 	private List<Card> turns;
+	private String difficulty;
 
 	
 	//creating constructor for Player with 1 parameter username
-	public Player(String username) {
+	public Player(String username, String difficulty) {
 		this.username = username;
 		this.cards = new ArrayList<>();
 		this.turns = new ArrayList<>();
+		this.difficulty = difficulty; 
 	}
 	
 	//creating getter method for username
@@ -48,6 +50,10 @@ public class Player {
 	
 	public void addTurn(List<Card> turn) {
 		turns.addAll(turn);
+	}
+	
+	public String getDifficulty() {
+		return difficulty;
 	}
 
 }

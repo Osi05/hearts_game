@@ -224,18 +224,37 @@ public class Game {
 		return cards.stream().anyMatch(card -> !card.getCardType().equals(excludedSuit));
 	}
 
+	
 	private Card cpPlay(Player cpPlayer, String leadingCardType) {
-		Card playedCard;
-		if (leadingCardType != null && hasCardType(cpPlayer.getCards(), leadingCardType)) {
-			playedCard = cpPlayer.getCards().stream().filter(card -> card.getCardType().equals(leadingCardType))
-					.findFirst().orElse(null);
-		} else {
-			playedCard = cpPlayer.getCards().get(0);
-		}
-		cpPlayer.getCards().remove(playedCard);
-		System.out.println(cpPlayer.getUsername() + " played: " + playedCard);
-		return playedCard;
+	    Card playedCard;
+	    String difficulty = cpPlayer.getDifficulty();
+
+	    switch (difficulty) {
+	        case "easy":
+	            // Randomly play any card
+	            playedCard = cpPlayer.getCards().get(0);
+	            break;
+	        case "hard":
+	            // Play a card following basic strategy
+	            playedCard = cpPlayer.getCards().stream()
+	                    .filter(card -> card.getCardType().equals(leadingCardType))
+	                    .findFirst().orElse(cpPlayer.getCards().get(0));
+	            break;
+	        case "expert":
+	            // Play a card following advanced strategy
+	            playedCard = cpPlayer.getCards().stream()
+	                    .filter(card -> card.getCardType().equals(leadingCardType))
+	                    .max((c1, c2) -> Integer.compare(c1.getCardWeight(), c2.getCardWeight()))
+	                    .orElse(cpPlayer.getCards().get(0));
+	            break;
+	        default:
+	            throw new IllegalStateException("Unexpected difficulty level: " + difficulty);
+	    }
+	    cpPlayer.removeCard(playedCard);
+	    System.out.println(cpPlayer.getUsername() + " played: " + playedCard);
+	    return playedCard;
 	}
+
 
 	private int determineTurnWinner(List<Card> turnCards) {
 		Card winningCard = turnCards.get(0);
